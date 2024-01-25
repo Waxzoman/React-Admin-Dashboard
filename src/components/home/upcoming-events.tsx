@@ -1,10 +1,37 @@
 import { CalendarOutlined } from '@ant-design/icons'
-import { Card, List } from 'antd'
+import { Badge, Card, List } from 'antd'
 import React, { useState } from 'react'
 import { Text } from '../text'
+import UpcomingEventsSkeleton from '../skeleton/upcoming-events'
+import { getDate } from '@/utilities/helpers'
+import { useList } from '@refinedev/core'
+import { DASHBORAD_CALENDAR_UPCOMING_EVENTS_QUERY } from '@/graphql/queries'
+import dayjs from 'dayjs'
 
 const UpcomingEvents = () => {
-    const [isloading, setIsLoading] = useState(true);  
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const { data, isLoading: eventsLoading } = useList({
+        resource: 'events',
+        pagination: { pageSize: 5 },
+        sorters: [
+            {
+                field: 'startDate',
+                order: 'asc'
+            }
+        ],
+        filters: [
+            {
+                field: 'stardDate',
+                operator: 'gte',
+                value: dayjs().format('YYYY-MM-DD')
+            }
+        ],
+        meta: {
+            gqlQuery: DASHBORAD_CALENDAR_UPCOMING_EVENTS_QUERY
+        } 
+    });
+    
   return (
       <Card
           style={{ height: '100%' }}
@@ -23,17 +50,38 @@ const UpcomingEvents = () => {
               </div>
           }
       >
-          {isloading ? (
+          {isLoading ? (
               <List
               itemLayout='horizontal'
                   dataSource={Array.from({ length: 5 }).map((_, index) => ({
                   id: index,
               }))}
-              >
-                  
-              </List>
+              renderItem={()=> <UpcomingEventsSkeleton/>}
+              />
           ) : (
-                  <List>
+                  <List
+                      itemLayout='horizontal'
+                      dataSource={data?.data || []}
+                      renderItem={(item) => {
+                          const renderDate = getDate(item.startDate, item.endDate)
+
+                          return (
+                              <List.Item>
+                                  <List.Item.Meta
+                                    avatar={<Badge color={item.color} />}
+                                    title={<Text size='xs'>{renderDate}</Text>}
+                                      description={
+                                          <Text
+                                              ellipsis={{ tooltip: true }}
+                                              strong
+                                          >
+                                              {item.title}
+                                          </Text>}
+                                  />
+                              </List.Item>
+                          )
+                      }}
+                  >
                       
                 </List>
           )}
