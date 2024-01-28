@@ -14,28 +14,28 @@ export const Home = () => {
   })
 
   return (
-    <div>
+    <div className="page-container">
       <Row
         gutter={[32, 32]}
       >
         <Col xs={24} sm={24} xl={8}>
           <DashboardTotalCountCard
             resource="companies"
-            isloading={isLoading}
+            isLoading={isLoading}
             totalCount={data?.data.companies.totalCount}
           />
         </Col>
         <Col xs={24} sm={24} xl={8}>
           <DashboardTotalCountCard
             resource="contacts"
-            isloading={isLoading}
+            isLoading={isLoading}
             totalCount={data?.data.contacts.totalCount}
           />
         </Col>
         <Col xs={24} sm={24} xl={8}>
           <DashboardTotalCountCard
             resource="deals"    
-            isloading={isLoading}
+            isLoading={isLoading}
             totalCount={data?.data.deals.totalCount}
           />
         </Col>
