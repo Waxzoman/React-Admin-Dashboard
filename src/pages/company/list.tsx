@@ -1,5 +1,5 @@
 import { COMPANIES_LIST_QUERY } from '@/graphql/queries';
-import { CreateButton, FilterDropdown, List } from '@refinedev/antd'
+import { CreateButton, DeleteButton, EditButton, FilterDropdown, List } from '@refinedev/antd'
 import { getDefaultFilter, useGo } from '@refinedev/core';
 import { useTable } from '@refinedev/antd';
 import { Input, Space, Table } from 'antd';
@@ -7,13 +7,41 @@ import React from 'react'
 import { SearchOutlined } from '@ant-design/icons';
 import CustomAvatar from '@/components/custom-avatar';
 import { Text } from '@/components/text';
+import { Company } from '@/graphql/schema.types';
+import { currencyNumber } from '@/utilities';
 
 export const CompanyList = () => {
   const go = useGo();
   const { tableProps, filters } = useTable({
     resource: 'companies',
+    onSearch: (values) => {
+      return [
+        {
+          field: 'name',
+          operator: 'contains',
+          value: values.name 
+        }
+      ]
+    },
     pagination: {
       pageSize: 12,
+    },
+    sorters: {
+      initial: [
+        {
+          field: 'createdAt',
+          order: 'desc'
+        }
+      ]
+    },
+    filters: {
+      initial: [
+        {
+          field: 'name',
+          operator: 'contains',
+          value: undefined
+        }
+      ]
     },
     meta: {
       gqlQuery: COMPANIES_LIST_QUERY
@@ -46,7 +74,7 @@ export const CompanyList = () => {
           ...tableProps.pagination,
         }}
       >
-        <Table.Column
+        <Table.Column<Company>
           dataIndex="name"
           title="Company name"
           defaultFilteredValue={getDefaultFilter('id', filters)}
@@ -66,6 +94,26 @@ export const CompanyList = () => {
               <Text style={{whiteSpace: 'nowrap'}}>
                 {record.name}
               </Text>
+            </Space>
+          )}
+        />
+        <Table.Column<Company>
+          dataIndex="totalRevenue"
+          title="Open deals amount"
+          render={(value, company) => (
+            <Text>
+              {currencyNumber(company?.dealsAggregate?.[0].sum?.value || 0)}
+            </Text>
+          )}
+        />
+        <Table.Column<Company>
+          dataIndex="id"
+          title="Actions"
+          fixed="right"
+          render={(value) => (
+            <Space>
+              <EditButton hideText size='small' recordItemId={value} />
+              <DeleteButton hideText size='small' recordItemId={value} />
             </Space>
           )}
         />
