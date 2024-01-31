@@ -10,7 +10,7 @@ import { Text } from '@/components/text';
 import { Company } from '@/graphql/schema.types';
 import { currencyNumber } from '@/utilities';
 
-export const CompanyList = () => {
+export const CompanyList = ({children}: React.PropsWithChildren) => {
   const go = useGo();
   const { tableProps, filters } = useTable({
     resource: 'companies',
@@ -19,7 +19,7 @@ export const CompanyList = () => {
         {
           field: 'name',
           operator: 'contains',
-          value: values.name 
+          value: values.name
         }
       ]
     },
@@ -49,6 +49,7 @@ export const CompanyList = () => {
   })
 
   return (
+    <div>
     <List
       breadcrumb={ false }
       headerButtons={() => (
@@ -119,6 +120,8 @@ export const CompanyList = () => {
         />
       </Table>
     </List>
+      {children}
+    </div>
   )
 }
 
