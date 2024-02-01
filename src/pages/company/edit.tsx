@@ -8,6 +8,7 @@ import { getNameInitials } from '@/utilities';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
 import { GetFieldsFromList } from '@refinedev/nestjs-query';
 import { Col, Form, Input, InputNumber, Row, Select } from 'antd';
+import { CompanyContactsTable } from './contact-table';
 
 const EditPage = () => {
     const {
@@ -107,8 +108,11 @@ const EditPage = () => {
                     </Form.Item>
                 </Form>
                 </Edit>      
-            </Col>      
-        </Row>      
+            </Col>  
+            <Col xs={24} xl={12}>
+                <CompanyContactsTable />
+            </Col>    
+        </Row>     
     </div>
   )
 }
