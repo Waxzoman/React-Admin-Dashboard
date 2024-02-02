@@ -4,7 +4,7 @@ import { useDroppable } from '@dnd-kit/core'
 import { Badge, Button, Space } from 'antd'
 import React, { Children } from 'react'
 
-const KanbanColumn = () => {
+const KanbanColumn = ({children}: React.PropsWithChildren) => {
     const { isOver, setNodeRef, active } = useDroppable({
       id: '',
       data: ''
@@ -15,7 +15,7 @@ const KanbanColumn = () => {
   const description = 'Description';
   const title = 'title';
   
-  const onAddClickHandler = ({children}: React.PropsWithChildren) => {}
+  const onAddClickHandler = () => {}
     
   return (
     <div
