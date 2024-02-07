@@ -1,3 +1,4 @@
+import { KanbanAddCardButton } from '@/components/tasks/kanban/add-card-button'
 import { KanbanBoardContainer, KanbanBoard } from '@/components/tasks/kanban/board'
 import ProjectCard from '@/components/tasks/kanban/card'
 import KanbanColumn from '@/components/tasks/kanban/column'
@@ -92,7 +93,13 @@ const List = () => {
                                   dueDate= {task.dueDate || undefined}
                             />
                         </KanbanItem>
-                    ))}
+                      ))}
+                      
+                      {!taskStages.unnasignedStage.length && (
+                          <KanbanAddCardButton
+                            onClick={() => handleAddCard({ stageId: 'unnasigned'})}
+                          />
+                      )}
                 </KanbanColumn>
             </KanbanBoard>          
         </KanbanBoardContainer>

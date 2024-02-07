@@ -1,8 +1,13 @@
+import CustomAvatar from '@/components/custom-avatar';
 import { Text } from '@/components/text';
+import { TextIcon } from '@/components/text-icon';
 import { User } from '@/graphql/schema.types'
-import { DeleteOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
-import { Button, Card, ConfigProvider, Dropdown, Space, theme } from 'antd';
-import React, { useMemo } from 'react'
+import { getDateColor } from '@/utilities';
+import { ClockCircleOutlined, DeleteOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
+import { useDelete, useNavigation } from '@refinedev/core';
+import { Button, Card, ConfigProvider, Dropdown, MenuProps, Space, Tag, Tooltip, theme } from 'antd';
+import dayjs from 'dayjs';
+import React, { memo, useMemo } from 'react'
 
 type ProjectCardProps = {
     id: string,
@@ -18,9 +23,11 @@ type ProjectCardProps = {
 
 const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
 
-  const {token} = theme.useToken();
+    const { token } = theme.useToken();
+    const { edit } = useNavigation();
+  const { mutate } = useDelete();
   
-  const edit = () => {}
+ 
 
   const dropdownItems = useMemo(() => {
     const dropdownItems: MenuProps["items"] = [
@@ -51,6 +58,18 @@ const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
 
     return dropdownItems;
   }, []);
+    
+  const dueDateOptions = useMemo(() => {
+    if (!dueDate) return null;
+
+    const date = dayjs(dueDate);
+
+    return {
+      color: getDateColor({ date: dueDate }) as string,
+      text: date.format("MMM D"),
+    };
+  }, [dueDate]);
+    
   return (
     <ConfigProvider
         theme={{
@@ -67,7 +86,9 @@ const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
         <Card
             size='small'
             title={<Text ellipsis={{ tooltip: title }}>{title}</Text>}
-            onClick={()=> edit()}
+            onClick={() => {
+                edit("tasks", id, "replace");
+            }}
               extra={
                 <Dropdown
                     trigger={["click"]}
@@ -166,3 +187,13 @@ const ProjectCard = ({ id, title, dueDate, users }: ProjectCardProps) => {
 }
 
 export default ProjectCard
+
+export const ProjectCardMemo = memo(ProjectCard, (prev, next) => {
+  return (
+    prev.id === next.id &&
+    prev.title === next.title &&
+    prev.dueDate === next.dueDate &&
+    prev.users?.length === next.users?.length &&
+    prev.updatedAt === next.updatedAt
+  );
+});
