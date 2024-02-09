@@ -1,7 +1,7 @@
 import { KanbanColumnSkeleton, ProjectCardSkeleton } from '@/components'
 import { KanbanAddCardButton } from '@/components/tasks/kanban/add-card-button'
 import { KanbanBoardContainer, KanbanBoard } from '@/components/tasks/kanban/board'
-import ProjectCard from '@/components/tasks/kanban/card'
+import ProjectCard, { ProjectCardMemo } from '@/components/tasks/kanban/card'
 import KanbanColumn from '@/components/tasks/kanban/column'
 import KanbanItem from '@/components/tasks/kanban/item'
 import { TASKS_QUERY, TASK_STAGES_QUERY } from '@/graphql/queries'
@@ -11,7 +11,7 @@ import { useList } from '@refinedev/core'
 import { GetFieldsFromList } from '@refinedev/nestjs-query'
 import React from 'react'
 
-const List = () => {
+const List = ({childen}: React.PropsWithChildren) => {
   const { data: stages, isLoading: isLoadingStages} = useList<TaskStage>({
     resource: 'taskStages',
       filters: [
@@ -114,11 +114,25 @@ const List = () => {
                         count={column.tasks.length}
                         onAddClick={() => handleAddCard({ stageId: column.id })}
                       >
-                          
+                        {!isLoading && column.tasks.map((task) =>  (
+                        <KanbanItem key={task.id} id={task.id} data={task}>
+                            <ProjectCardMemo
+                            {...task}
+                            dueDate={task.dueDate || undefined}
+                            />
+                        </KanbanItem>
+                            )
+                      )}
+                      {!column.tasks.length && (
+                        <KanbanAddCardButton
+                            onClick={() => handleAddCard({ stageId: column.id })}
+                          />
+                      )}
                       </KanbanColumn>
                   ))}
             </KanbanBoard>          
-        </KanbanBoardContainer>
+      </KanbanBoardContainer>
+      {children}
     </>
   )
 }
