@@ -12,8 +12,12 @@ import { DragEndEvent } from '@dnd-kit/core'
 import { useList, useUpdate } from '@refinedev/core'
 import { GetFieldsFromList } from '@refinedev/nestjs-query'
 import React from 'react'
+import { useNavigation } from '@refinedev/core';
 
 const List = ({children}: React.PropsWithChildren) => {
+
+  const { replace } = useNavigation();
+
   const { data: stages, isLoading: isLoadingStages} = useList<TaskStage>({
     resource: 'taskStages',
       filters: [
@@ -66,16 +70,22 @@ const List = ({children}: React.PropsWithChildren) => {
     const unassignedStage = tasks.data.filter((task)=> task.stageId === null);
     const grouped: TaskStage[] = stages.data.map((stage)=>({
         ...stage,
-        tasks: tasks.data.filter((task)=>task.stageId?.toString()=== stage.id)
+        tasks: tasks.data.filter((task)=>task.stageId?.toString()=== stage.id),
     }))
       
     return {
-        unassignedStage,
-        columns: grouped
-    }
+      unassignedStage,
+      columns: grouped
+    };
   }, [stages, tasks])
     
-  const handleAddCard = (args: { stageId: string}) => {}
+  const handleAddCard = (args: { stageId: string }) => {
+    const path = args.stageId === 'unassigned'
+      ? 'tasks/new'
+      : `/tasks/new?stageId=${args.stageId}`
+    
+    replace(path);
+  }
 
   const handleOnDragEnd = (event: DragEndEvent) => {
     let stageId = event.over?.id as undefined | string | null
